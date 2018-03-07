@@ -1,0 +1,9 @@
+[package]
+name = "ndarray-solve-ivp"
+version = "0.1.0"
+authors = ["Jim Turner <rust@turner.link>"]
+
+[dependencies]
+quick-error = "1.2"
+lazy_static = "1.0"
+ndarray = "0.11"
