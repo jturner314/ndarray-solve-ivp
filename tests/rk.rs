@@ -43,7 +43,7 @@ fn integration() {
         rtol.clone(),
         atol.clone(),
     ).unwrap();
-    solver.run_to_end().unwrap();
+    solver.run_to_bound().unwrap();
     assert!(
         compute_error(
             solver.state(),
