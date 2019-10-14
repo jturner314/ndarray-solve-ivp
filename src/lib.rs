@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate lazy_static;
-#[macro_use]
 extern crate ndarray;
 #[macro_use]
 extern crate quick_error;

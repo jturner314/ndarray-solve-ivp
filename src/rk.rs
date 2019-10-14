@@ -356,16 +356,15 @@ where
 
             // Perform step and calculate error norm.
             let StepOutput { y_new, error } = self.step_by(h);
-            azip!(
-                mut scale,
-                y (self.y.view()),
-                y_new,
-                atol (self.atol.view()),
-                rtol (self.rtol.view()) in
-                {
-                    *scale = atol + y.abs().max(y_new.abs()) * rtol;
-                }
-            );
+            azip!((
+                scale in &mut scale,
+                &y in &self.y,
+                &y_new in &y_new,
+                &atol in &self.atol,
+                &rtol in &self.rtol,
+            ) {
+                *scale = atol + y.abs().max(y_new.abs()) * rtol;
+            });
             let error_norm = norm(error.view(), scale.view());
 
             // Accept or reject step based on error norm.
