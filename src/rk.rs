@@ -334,7 +334,7 @@ where
         self.y.len()
     }
 
-    fn step(&mut self) -> Result<(), Box<Error>> {
+    fn step(&mut self) -> Result<(), Box<dyn Error>> {
         let min_step =
             10. * (next_after(self.t, self.direction * ::std::f64::INFINITY) - self.t).abs();
 

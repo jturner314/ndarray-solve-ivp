@@ -13,7 +13,7 @@ pub trait OdeIntegrate {
     /// Returns the number of elements in the state.
     fn len(&self) -> usize;
     /// Perform one step (adaptive step size).
-    fn step(&mut self) -> Result<(), Box<Error>>;
+    fn step(&mut self) -> Result<(), Box<dyn Error>>;
     /// Current time.
     fn time(&self) -> f64;
     /// The ending time.
@@ -25,7 +25,7 @@ pub trait OdeIntegrate {
         self.time() == self.time_bound()
     }
     /// Integrate until reaching `time_bound`.
-    fn run_to_bound(&mut self) -> Result<(), Box<Error>> {
+    fn run_to_bound(&mut self) -> Result<(), Box<dyn Error>> {
         while !self.finished() {
             self.step()?;
         }
