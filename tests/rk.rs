@@ -1,13 +1,8 @@
-#[macro_use]
-extern crate ndarray;
-extern crate ndarray_solve_ivp;
-
 use ndarray::prelude::*;
-
 use ndarray_solve_ivp::rk::{RungeKutta, RK45};
 use ndarray_solve_ivp::OdeIntegrate;
 
-fn fun_rational(t: f64, y: ArrayView1<f64>, mut dy: ArrayViewMut1<f64>) {
+fn fun_rational(t: f64, y: ArrayView1<'_, f64>, mut dy: ArrayViewMut1<'_, f64>) {
     dy[0] = y[1] / t;
     dy[1] = y[1] * (y[0] + 2. * y[1] - 1.) / (t * (y[0] - 1.));
 }
@@ -17,10 +12,10 @@ fn sol_rational(t: f64) -> Array1<f64> {
 }
 
 fn compute_error(
-    y: ArrayView1<f64>,
-    y_true: ArrayView1<f64>,
-    rtol: ArrayView1<f64>,
-    atol: ArrayView1<f64>,
+    y: ArrayView1<'_, f64>,
+    y_true: ArrayView1<'_, f64>,
+    rtol: ArrayView1<'_, f64>,
+    atol: ArrayView1<'_, f64>,
 ) -> Array1<f64> {
     let e = (&y - &y_true) / (y_true.mapv(f64::abs) * &rtol + &atol);
     (&e * &e / e.len() as f64).mapv(f64::sqrt)

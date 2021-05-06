@@ -1,8 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
-extern crate ndarray;
-extern crate thiserror;
-
 pub mod rk;
 
 use ndarray::prelude::*;
@@ -18,7 +13,7 @@ pub trait OdeIntegrate {
     /// The ending time.
     fn time_bound(&self) -> f64;
     /// Current state.
-    fn state(&self) -> ArrayView1<f64>;
+    fn state(&self) -> ArrayView1<'_, f64>;
     /// Returns `true` if the integration has reached `time_bound`.
     fn finished(&self) -> bool {
         self.time() == self.time_bound()

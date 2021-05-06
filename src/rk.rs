@@ -1,12 +1,13 @@
 //! Runge–Kutta solvers.
 
+use lazy_static::lazy_static;
 use ndarray::prelude::*;
 use ndarray::{FoldWhile, Zip};
 use std::error::Error;
 use std::marker::PhantomData;
 use thiserror::Error;
 
-use OdeIntegrate;
+use crate::OdeIntegrate;
 
 /// Multiply steps computed from asymptotic behaviour of errors by this.
 const SAFETY: f64 = 0.9;
@@ -16,7 +17,7 @@ const MIN_FACTOR: f64 = 0.2;
 const MAX_FACTOR: f64 = 10.;
 
 /// Computes RMS norm of scaled values.
-fn norm(x: ArrayView1<f64>, scale: ArrayView1<f64>) -> f64 {
+fn norm(x: ArrayView1<'_, f64>, scale: ArrayView1<'_, f64>) -> f64 {
     debug_assert_eq!(x.len(), scale.len());
     (Zip::from(x)
         .and(scale)
@@ -56,15 +57,15 @@ fn norm(x: ArrayView1<f64>, scale: ArrayView1<f64>) -> f64 {
 fn select_initial_step<F>(
     fun: &mut F,
     t0: f64,
-    y0: ArrayView1<f64>,
-    f0: ArrayView1<f64>,
+    y0: ArrayView1<'_, f64>,
+    f0: ArrayView1<'_, f64>,
     direction: f64,
     order: usize,
-    rtol: ArrayView1<f64>,
-    atol: ArrayView1<f64>,
+    rtol: ArrayView1<'_, f64>,
+    atol: ArrayView1<'_, f64>,
 ) -> f64
 where
-    F: FnMut(f64, ArrayView1<f64>, ArrayViewMut1<f64>),
+    F: FnMut(f64, ArrayView1<'_, f64>, ArrayViewMut1<'_, f64>),
 {
     if y0.is_empty() {
         return ::std::f64::INFINITY;
@@ -96,7 +97,7 @@ where
 /// Runge–Kutta ODE IVP solver.
 pub struct RungeKutta<F, O>
 where
-    F: FnMut(f64, ArrayView1<f64>, ArrayViewMut1<f64>),
+    F: FnMut(f64, ArrayView1<'_, f64>, ArrayViewMut1<'_, f64>),
     O: RKMethod,
 {
     fun: F,
@@ -152,7 +153,7 @@ struct StepOutput {
 
 impl<F, O> RungeKutta<F, O>
 where
-    F: FnMut(f64, ArrayView1<f64>, ArrayViewMut1<f64>),
+    F: FnMut(f64, ArrayView1<'_, f64>, ArrayViewMut1<'_, f64>),
     O: RKMethod,
 {
     /// Creates a new `RungeKutta` solver.
@@ -238,7 +239,7 @@ where
     }
 
     /// Current state derivative.
-    pub fn state_deriv(&self) -> ArrayView1<f64> {
+    pub fn state_deriv(&self) -> ArrayView1<'_, f64> {
         self.k.slice(s![-1, ..])
     }
 
@@ -315,7 +316,7 @@ fn next_after(x: f64, y: f64) -> f64 {
 
 impl<F, O> OdeIntegrate for RungeKutta<F, O>
 where
-    F: FnMut(f64, ArrayView1<f64>, ArrayViewMut1<f64>),
+    F: FnMut(f64, ArrayView1<'_, f64>, ArrayViewMut1<'_, f64>),
     O: RKMethod,
 {
     fn len(&self) -> usize {
@@ -381,7 +382,7 @@ where
         self.t_bound
     }
     /// Current state.
-    fn state(&self) -> ArrayView1<f64> {
+    fn state(&self) -> ArrayView1<'_, f64> {
         self.y.view()
     }
 }
