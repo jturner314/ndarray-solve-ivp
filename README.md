@@ -7,7 +7,7 @@ array type. The numerical results should be identical.
 
 ## License
 
-Copyright 2018 Jim Turner
+Copyright 2018–2021 Jim Turner
 
 Licensed under the [Apache License, Version 2.0](LICENSE-APACHE) or the [MIT
 license](LICENSE-MIT), at your option. You may not use this project except in
