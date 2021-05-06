@@ -6,5 +6,5 @@ edition = "2018"
 
 [dependencies]
 lazy_static = "1.0"
-ndarray = "0.13"
+ndarray = "0.14"
 thiserror = "1.0"
