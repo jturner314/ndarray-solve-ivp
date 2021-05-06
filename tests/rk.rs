@@ -4,8 +4,8 @@ extern crate ndarray_solve_ivp;
 
 use ndarray::prelude::*;
 
+use ndarray_solve_ivp::rk::{RungeKutta, RK45};
 use ndarray_solve_ivp::OdeIntegrate;
-use ndarray_solve_ivp::rk::{RK45, RungeKutta};
 
 fn fun_rational(t: f64, y: ArrayView1<f64>, mut dy: ArrayViewMut1<f64>) {
     dy[0] = y[1] / t;
@@ -42,15 +42,15 @@ fn integration() {
         max_step,
         rtol.clone(),
         atol.clone(),
-    ).unwrap();
+    )
+    .unwrap();
     solver.run_to_bound().unwrap();
-    assert!(
-        compute_error(
-            solver.state(),
-            sol_rational(t_bound).view(),
-            rtol.view(),
-            atol.view()
-        ).iter()
-            .all(|&e| e < 5.)
-    );
+    assert!(compute_error(
+        solver.state(),
+        sol_rational(t_bound).view(),
+        rtol.view(),
+        atol.view()
+    )
+    .iter()
+    .all(|&e| e < 5.));
 }
