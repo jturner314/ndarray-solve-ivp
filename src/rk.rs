@@ -4,6 +4,7 @@ use ndarray::{FoldWhile, Zip};
 use ndarray::prelude::*;
 use std::error::Error;
 use std::marker::PhantomData;
+use thiserror::Error;
 
 use OdeIntegrate;
 
@@ -126,29 +127,19 @@ where
     k: Array2<f64>,
 }
 
-quick_error! {
-    #[derive(Debug)]
-    pub enum CreateRungeKuttaError {
-        TimeBoundNotFinite {
-            description("t_bound is not finite")
-            display(x) -> ("{}", x.description())
-        }
-        MaxStepZeroOrNeg {
-            description("max_step is zero or negative")
-            display(x) -> ("{}", x.description())
-        }
-        UnequalLengths {
-            description("array arguments have unequal lengths")
-            display(x) -> ("{}", x.description())
-        }
-        /// The relative tolerance was too small.
-        ///
-        /// It must be at least `100. * ::std::f64::EPSILON`.
-        TooSmallRelTol {
-            description("rtol is too small")
-            display(x) -> ("{}", x.description())
-        }
-    }
+#[derive(Debug, Error)]
+pub enum CreateRungeKuttaError {
+    #[error("t_bound is not finite")]
+    TimeBoundNotFinite,
+    #[error("max_step is zero or negative")]
+    MaxStepZeroOrNeg,
+    #[error("array arguments have unequal lengths")]
+    UnequalLengths,
+    /// The relative tolerance was too small.
+    ///
+    /// It must be at least `100. * ::std::f64::EPSILON`.
+    #[error("rtol is too small")]
+    TooSmallRelTol,
 }
 
 struct StepOutput {
@@ -287,14 +278,10 @@ where
     }
 }
 
-quick_error! {
-    #[derive(Debug)]
-    pub enum RungeKuttaStepError {
-        TooSmallStep(required: f64, allowable: f64) {
-            description("required step size is too small")
-            display(x) -> ("required step size {} is smaller than min allowable step size {}", required, allowable)
-        }
-    }
+#[derive(Debug, Error)]
+pub enum RungeKuttaStepError {
+    #[error("required step size {required} is smaller than min allowable step size {allowable}")]
+    TooSmallStep { required: f64, allowable: f64 },
 }
 
 /// Computes the next representable floating-point value following `x` in the
@@ -344,7 +331,10 @@ where
         loop {
             // Update `h_abs` and calcualte `t_new` and `h`.
             if h_abs < min_step {
-                return Err(Box::new(RungeKuttaStepError::TooSmallStep(h_abs, min_step)));
+                return Err(Box::new(RungeKuttaStepError::TooSmallStep {
+                    required: h_abs,
+                    allowable: min_step,
+                }));
             }
             let t_new = if h_abs >= (self.t_bound - self.t).abs() {
                 self.t_bound

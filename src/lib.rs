@@ -1,8 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 extern crate ndarray;
-#[macro_use]
-extern crate quick_error;
+extern crate thiserror;
 
 pub mod rk;
 
